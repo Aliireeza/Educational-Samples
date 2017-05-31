@@ -46,6 +46,13 @@ static int __init hello_world_init(void){
 	printk(KERN_ALERT "HELLOWORLD: Hello %s!\n", hellostring);
 	printk(KERN_INFO "HELLOWORLD: Module \"%s\" Loading,  By Process \"%s:%i\"\n", MY_MODULE_NAME, current->comm, current->pid);
 
+	
+	printk(KERN_INFO "HELLOWORLD: You could install this module using \"insmod %s.ko\" command.\n", MY_MODULE_NAME);
+	printk(KERN_INFO "HELLOWORLD: You could remove this module using \"rmmod %s\" command.\n", MY_MODULE_NAME);
+	printk(KERN_INFO "HELLOWORLD: You could see this module information \"modinfo ./%s.ko\" command.\n", MY_MODULE_NAME);
+	printk(KERN_INFO "HELLOWORLD: Now let us do our main job in this module again, print hello world in kernel log\n");
+	printk(KERN_INFO "HELLOWORLD: %s\n", MY_MODULE_NAME);
+	printk(KERN_INFO "HELLOWORLD: You could see these messages with \"dmesg\" or \"cat /dev/kmsg\" commands\n");
 	//The init_module should return a value to the rest of The Kernel, that asure
 	//other modules and system calls about the successfull registration of its functionality
 	return 0;
