@@ -12,47 +12,73 @@
 #include <asm/current.h>
 //For using task_struct
 #include <linux/sched.h>
-//For getting system information
-#include <linux/utsname.h>
 //For ioctl commands and macros
 #include <linux/ioctl.h>
 #include <asm/ioctl.h>
 //For copy_to_user, copy_from_user, put_user
 #include <asm/uaccess.h>
+//For get_current_user and get_current_cred
+#include <linux/cred.h>
+
+#include "commonioctlcommands.h"
+
 
 //It is always good to have a meaningful constant as a return code
 #define SUCCESS 0
 //This will be our module name
-#define DEVICE_NAME "information"
+#define DEVICE_NAME "selfprocess"
 
 
-//These are our ioctl definition
-#define MAGIC 'T'
-#define IOC_MAXNR 6
-#define IOCTL_SYSNAME _IOR(MAGIC, 0, char)
-#define IOCTL_NODENAME _IOR(MAGIC, 1, char)
-#define IOCTL_RELEASE _IOR(MAGIC, 2, char)
-#define IOCTL_VERSION _IOR(MAGIC, 3, char)
-#define IOCTL_MACHINE _IOR(MAGIC, 4, char)
-#define IOCTL_DOMAINNAME _IOR(MAGIC, 5, char)
 
 //These are some useful information that could reveald with modinfo command
 //Set module license to get rid of tainted kernel warnings
 MODULE_LICENSE("GPL");
 //Introduce the module's developer, it's functionality and version
 MODULE_AUTHOR("Aliireeza Teymoorian <teymoorian@gmail.com>");
-MODULE_DESCRIPTION("This is just a simple Kernel module using procfs, which could be used as ioctl handler in user space to obtain some system information");
+MODULE_DESCRIPTION("This is just a simple Kernel module using procfs, which could be used as ioctl handler in user space to obtain some process information");
 MODULE_VERSION("1.0.2");
 
 //Creating a proc directory entry structure
 static struct proc_dir_entry* our_proc_file;
 
 
+//This is a simple function which turn unsigned long to string
+void ltoa(unsigned long value, char *ptr, int base){
+	unsigned long t = 0, res = 0;
+    unsigned long tmp = value;
+    int count = 0;
+
+    if (NULL == ptr)
+      return NULL;
+
+    if (tmp == 0)
+      count++;
+
+    while(tmp > 0){
+      tmp = tmp/base;
+      count++;
+    }
+
+    ptr += count;
+    *ptr = '\0';
+
+    do{
+      res = value - base * (t = value / base);
+      if (res < 10)
+        * -- ptr = '0' + res;
+      else if ((res >= 10) && (res < 16))
+        * --ptr = 'A' - 10 + res;
+    }while ((value = t) != 0);
+
+    return(ptr);
+}
+
+
 //When device recive ioctl commands this function will perform the job depending on what kind of command it recieved
 long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	static int err = 0, retval = 0;
-
-	printk(KERN_INFO "IOCTLPROCFS: IOCTL Function, Process \"%s:%i\"\n", current->comm, current->pid);
+	unsigned long value;
+	char output[30];
 	printk(KERN_INFO "IOCTLPROCFS: IOCTL Command, %d\n", cmd);
 
 	if(_IOC_TYPE(cmd) != MAGIC || _IOC_NR(cmd) > IOC_MAXNR)
@@ -64,42 +90,97 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 		err = !access_ok(VERIFY_WRITE, (void __user *) arg, _IOC_SIZE(cmd));
 	if(err)
 		return -EFAULT;
-	
+
 	switch(cmd){
-		case IOCTL_SYSNAME:
-			copy_to_user((int __user *) arg, utsname()->sysname, 30);
+		case IOCTL_PROCESS_NAME:
+			strcpy(output, current->comm);
 			break;
-		case IOCTL_NODENAME:
-			copy_to_user((int __user *) arg, utsname()->nodename, 30);
+		case IOCTL_PROCESS_PID:
+			value = current->pid;
+			ltoa(value, output, 10);
 			break;
-		case IOCTL_RELEASE:
-			copy_to_user((int __user *) arg, utsname()->release, 30);
+		case IOCTL_PROCESS_UID:
+			value = get_current_user()->uid.val;
+			ltoa(value, output, 10);
 			break;
-		case IOCTL_VERSION:
-			copy_to_user((int __user *) arg, utsname()->version, 30);
+		case IOCTL_PROCESS_EUID:
+			value = get_current_cred()->euid.val;
+			ltoa(value, output, 10);
 			break;
-		case IOCTL_MACHINE:
-			copy_to_user((int __user *) arg, utsname()->machine, 30);
+		case IOCTL_PROCESS_SUID:
+			value = get_current_cred()->suid.val;
+			ltoa(value, output, 10);
 			break;
-		case IOCTL_DOMAINNAME:
-			copy_to_user((int __user *) arg, utsname()->domainname, 30);
+		case IOCTL_PROCESS_FSUID:
+			value = get_current_cred()->fsuid.val;
+			ltoa(value, output, 10);
+			break;
+
+		case IOCTL_PROCESS_GID:
+			value = get_current_cred()->gid.val;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_EGID:
+			value = get_current_cred()->egid.val;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_SGID:
+			value = get_current_cred()->sgid.val;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_FSGID:
+			value = get_current_cred()->fsgid.val;
+			ltoa(value, output, 10);
+			break;
+
+		case IOCTL_PROCESS_PGRP:
+			value = task_pgrp(current);
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_PRIORITY:
+			value = current->prio;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_REAL_PRIORITY:
+			value = current->rt_priority;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_PROCESSOR:
+			value = current->cpu;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_UTIME:
+			value = current->utime;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_STIME:
+			value = current->stime;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_GTIME:
+			value = current->gtime;
+			ltoa(value, output, 10);
+			break;
+		case IOCTL_PROCESS_STARTTIME:
+			value = current->start_time;
+			ltoa(value, output, 10);
 			break;
 		default:
 			printk(KERN_ALERT "IOCTLPROCFS: Invalid IOCTL Command!\n");
 			return -ENOTTY;
 	}
+	copy_to_user((int __user *) arg, output, 30);
 	return retval;
 }
 
 
 //This function calls on demand of read request from seq_files
 static int proc_show(struct seq_file *m, void *v){
-	seq_printf(m, "IOCTL_SYSNAME, %lu\n", IOCTL_SYSNAME);
-	seq_printf(m, "IOCTL_NODENAME, %lu\n", IOCTL_NODENAME);
-	seq_printf(m, "IOCTL_RELEASE, %lu\n", IOCTL_RELEASE);
-	seq_printf(m, "IOCTL_VERSION, %lu\n", IOCTL_VERSION);
-	seq_printf(m, "IOCTL_MACHINE, %lu\n", IOCTL_MACHINE);
-	seq_printf(m, "IOCTL_DOMAINNAME, %lu\n", IOCTL_DOMAINNAME);
+	seq_printf(m, "Process Name: %s [PID: %d, PGRP: %d, Priority:%lu]\n", current->comm, current->pid, task_pgrp(current), current->prio);
+	seq_printf(m, "INFO: processor(%d), Real Time Priority(%lu)\n", current->cpu, current->rt_priority);
+	seq_printf(m, "Times: utime(%lu), stime(%lu), gtime(%lu), start_time(%lu)\n", current->utime, current->stime, current->gtime, current->start_time);
+	seq_printf(m, "USER: UID(%d), eUID(%d), sUID(%d), fsUID(%d)\n", get_current_user()->uid.val, get_current_cred()->euid.val, get_current_cred()->suid.val, get_current_cred()->fsuid.val);
+	seq_printf(m, "GROUP: GID(%d), eGID(%d), sGID(%d), fsGID(%d)\n", get_current_cred()->gid.val, get_current_cred()->egid.val, get_current_cred()->sgid.val, get_current_cred()->fsgid.val);
 	return SUCCESS;
 }
 

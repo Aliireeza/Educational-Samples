@@ -30,7 +30,7 @@ int main(){
 		return 0;
 		}
 
-	//Third, we have to show the user meau
+	//Third, we have to show the user menu
 	printf("--------   Procfs-IOCTL System Information   --------\n");
 	printf("Enter a Number Between 1 to 6:\n");
 	printf("1:SysName\t2:NodeName\n3:Release\t4:Version\n5:Machine\t6:DomainName\n\n");

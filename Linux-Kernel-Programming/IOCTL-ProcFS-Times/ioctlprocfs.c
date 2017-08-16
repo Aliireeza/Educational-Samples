@@ -257,7 +257,7 @@ static const struct file_operations fops = {
 
 
 //Your module's entry point
-static int __init capability_procfs_init(void){
+static int __init ioctl_procfs_init(void){
 	//These mesages will not show to the user but instead they will apear in kernel log
 	//You can observe the kernel log in /dev/kmsg or with using dmsg command
 	printk(KERN_INFO "IOCTLPROCFS: Initialization.\n");
@@ -279,7 +279,7 @@ static int __init capability_procfs_init(void){
 
 
 //You sould clean up the mess before exiting the module
-static void __exit capability_procfs_exit(void){
+static void __exit ioctl_procfs_exit(void){
 	//Initiating module unloading procedure
 	printk(KERN_INFO "IOCTLPROCFS: Cleanup Module, Process \"%s:%i\"\n", current->comm, current->pid);
 
@@ -292,5 +292,5 @@ static void __exit capability_procfs_exit(void){
 }
 
 //Now we need to define init-module and cleanup_module aliases
-module_init(capability_procfs_init);
-module_exit(capability_procfs_exit);
+module_init(ioctl_procfs_init);
+module_exit(ioctl_procfs_exit);

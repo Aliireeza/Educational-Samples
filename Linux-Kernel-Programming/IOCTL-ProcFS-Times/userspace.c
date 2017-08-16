@@ -34,7 +34,7 @@ int main(){
 		return 0;
 		}
 
-	//Third, we have to show the user meau
+	//Third, we have to show the user menu
 	printf("--------   Procfs-IOCTL System Times   --------\n");
 	printf("Enter a Number Between 1 to 12:\n");
 	printf("1:Uptime\t2:IRQ Time\n");
