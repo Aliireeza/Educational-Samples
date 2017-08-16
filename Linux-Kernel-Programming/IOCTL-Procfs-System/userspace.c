@@ -13,12 +13,15 @@ int main(){
 	char *match;
 	int i;
 	unsigned long ioctlcmd;
-	
+
+	//First, Open the proc file to read the content of it
 	fp_proc = fopen("/proc/information", "r");
 	if(!fp_proc){
 		printf("/proc/information is not available\n");
 		return 0;
 		}
+
+	//Second, By fread, we will obtain the whole contnet which is tuples of IOCTL_SYSNAME//commands name and value
 	bytes_read = fread(buffer, 1, sizeof(buffer), fp_proc);
 	fclose(fp_proc);
 
@@ -27,11 +30,16 @@ int main(){
 		return 0;
 		}
 
+	//Third, we have to show the user meau
+	printf("--------   Procfs-IOCTL System Information   --------\n");
 	printf("Enter a Number Between 1 to 6:\n");
-	printf("1:SysName\t2:NodeName\n3:Release\t4:Version\n5:Machine\t6:DomainName\n");
+	printf("1:SysName\t2:NodeName\n3:Release\t4:Version\n5:Machine\t6:DomainName\n\n");
 	printf("Your Choice: ");
 	scanf("%d", &i);
+	printf("-----------------------------------------------------\n");
 
+	//Fourth, we have to read the correct line of the content
+	//using sscanf to obtain the value of user selected IOCTL command
 	switch(i){
 		case 1:
 			match = strstr(buffer, "IOCTL_SYSNAME");
@@ -92,10 +100,13 @@ int main(){
 			return -1;
 	}
 
+	//Fifth, we have to open a file (local) socket to the proc file again
 	int fd = open("/proc/information", O_RDONLY);
+	//Sixth, we send the obtained IOCTL command value to the driver through our socket
 	ioctl(fd, ioctlcmd, output);
 	close(fd);
 
+	//Finally, we can print out the result of IOCTL command execution
 	printf("Output: %s\n", output);
 	return 0;
 }
