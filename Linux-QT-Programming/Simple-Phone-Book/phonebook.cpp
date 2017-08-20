@@ -25,29 +25,29 @@ class Phonebook : public QWidget {
         Phonebook(QWidget *parent = 0);
 
     private:
-		QPushButton *connectbutton;
-		QPushButton *listcontact;
-		QPushButton *addcontact;
-		QPushButton *delcontact;
-		QPushButton *updatecontact;
-		QPushButton *removecontact;
-		QPushButton *searchcontact;
-		QPushButton *quitbutton;
+	QPushButton *connectbutton;
+	QPushButton *listcontact;
+	QPushButton *addcontact;
+	QPushButton *delcontact;
+	QPushButton *updatecontact;
+	QPushButton *removecontact;
+	QPushButton *searchcontact;
+	QPushButton *quitbutton;
 
-		QSqlDatabase db;
-		QMessageBox messagebox;
+	QSqlDatabase db;
+	QMessageBox messagebox;
 
-		QString password;
-		QString username;
-		QString dbname;
+	QString password;
+	QString username;
+	QString dbname;
 
-		QString contactname = "NULL";
-		QString contacthome = "NULL";
-		QString contactwork = "NULL";
-		QString contactmobile = "NULL";
-		QString contactemail = "NULL";
+	QString contactname = "NULL";
+	QString contacthome = "NULL";
+	QString contactwork = "NULL";
+	QString contactmobile = "NULL";
+	QString contactemail = "NULL";
 
-		void GetContact();
+	void GetContact();
 
     private slots:
     	void ConnectDatabase();
@@ -106,6 +106,8 @@ Phonebook::Phonebook(QWidget *parent): QWidget(parent) {
 	connect(searchcontact, &QPushButton::clicked, this, &Phonebook::SearchName);
 }
 
+
+
 //Connecting to database should create a connection, database and table if neccessary
 void Phonebook::ConnectDatabase() {
 	bool ok;
@@ -130,7 +132,7 @@ void Phonebook::ConnectDatabase() {
 	//If everythings went well till this point, we can create a connection and
 	//send SQL commands for creating database and table
 	if (!db.isValid()){
-    	messagebox.setText("Connection Failure: " + db.lastError().text());
+    		messagebox.setText("Connection Failure: " + db.lastError().text());
 		messagebox.setWindowTitle("Error :(");
 		messagebox.exec();
 		return;
@@ -191,9 +193,12 @@ void Phonebook::ConnectDatabase() {
 }
 
 
+
 //For listing contacts, we have to create a query of SELECT syntax and
 //send it to the database, then print the result set one row at a time
 void Phonebook::ListContacts() {
+	//Using datbase transactions, at least assures us that our operations will
+	//execute as an atomic procedure so the integrity of data will endure
 	db.transaction();
 		QSqlQuery query;
 		QTextStream output(stdout);
@@ -223,6 +228,7 @@ void Phonebook::ListContacts() {
 }
 
 
+
 //For remove all contacts, again we can create a simple SQL command and send it
 void Phonebook::RemoveContacts() {
 	QSqlQuery query;
@@ -248,6 +254,7 @@ void Phonebook::RemoveContacts() {
 			output << "All Contacts Deleted (" << query.size() << ")" << endl;
 	}
 }
+
 
 
 //For searching a contact, we have to ask for a name (primary key), then send
@@ -291,6 +298,7 @@ void Phonebook::SearchName() {
 			}
 		}
 }
+
 
 
 //This function create a satisfactory dialog box with five inputs, one for each
@@ -353,6 +361,7 @@ void Phonebook::GetContact(){
 }
 
 
+
 //For adding a new contact, we will get the information by using above function
 //then, it is all the same as any other queries
 void Phonebook::AddContact() {
@@ -374,6 +383,8 @@ void Phonebook::AddContact() {
 		output << "Contact " << contactname << " Added Successfuly" << endl;
 }
 
+
+
 //For updating an existing contact, we will get the information by using above function
 //then, it is all the same as any other queries
 void Phonebook::UpdateContact() {
@@ -394,6 +405,7 @@ void Phonebook::UpdateContact() {
 	else
 		output << "Contact " << contactname << " Updated Successfuly" << endl;
 }
+
 
 
 //For deleting a contact, fist we have to get its name (primary key) then
