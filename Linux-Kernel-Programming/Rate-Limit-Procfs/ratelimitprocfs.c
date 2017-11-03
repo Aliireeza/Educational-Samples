@@ -31,24 +31,50 @@ MODULE_VERSION("1.0.2");
 
 //Creating a proc directory entry structure
 static struct proc_dir_entry* our_proc_file;
+static int counter = 0;
+
+
+//Now there is a re-written version of simply used for_each_process loop
+void browse_processes(struct task_struct *curr_task){
+	struct task_struct *task_next;
+	struct list_head *list;
+
+	//This loop will go around the whole task_struct list in which the Kernel holds all the processes on the system
+	list_for_each(list, &curr_task->children){
+		task_next = list_entry(list, struct task_struct, sibling);
+		//printk_ratelimit will stop producing logs when you reach the limit which idicated (and could be set) in
+		//    /proc/sys/kernel/printk_ratelimit_burst
+
+		//Also this interrupt will last for at least as equal to the time specified (and could be set) in
+		//    /proc/sys/kernel/printk_ratelimit
+		if(printk_ratelimit())
+			printk(KERN_INFO "RATELIMITPROCFS: Process \"%s:%d\"\n", task_next->comm, task_next->pid);
+	
+		counter++;
+		browse_processes(task_next);
+	}  
+}
 
 
 //This function calls on demand of read request from seq_files
 static int proc_show(struct seq_file *m, void *v){
 	printk(KERN_INFO "RATELIMITPROCFS: Generating output for user space with seq_files.\n");
 	//We are going to count processes which are currently running on the context of the Kernel
-	struct task_struct *iTask;
-	int counter=0;
-
-	for_each_process(iTask){
-		if(printk_ratelimit())
-			printk(KERN_INFO "RATELIMITPROCFS: Process \"%s:%d\" in %ld state\n", iTask->comm, iTask->pid, iTask->state);
-		counter++;
-	}
-
+	static struct task_struct *curr_task, *init_task;
+	counter = 0;
+	
+	//First capture the pointer to the current process
+	curr_task = get_current();
+	//With this loop we can find the init_process
+	for(init_task = curr_task; init_task->pid != 0; init_task = init_task->parent);
+	browse_processes(init_task);
+	
+	//Now print the essential hello world output
 	seq_printf(m, "Hello World along side with %d processes :)\n", counter);
 	return SUCCESS;
 }
+
+
 
 //This is where system functionallity triggers every time some process try to read from our proc entry
 static int proc_open(struct inode *inode, struct file *file){
