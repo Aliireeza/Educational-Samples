@@ -17,7 +17,7 @@
 //For ioctl commands and macros
 #include <linux/ioctl.h>
 #include <asm/ioctl.h>
-//For copy_to_user, copy_from_user, put_user
+//For raw_copy_to_user, raw_copy_from_user, put_user
 #include <asm/uaccess.h>
 
 //It is always good to have a meaningful constant as a return code
@@ -67,22 +67,22 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	
 	switch(cmd){
 		case IOCTL_SYSNAME:
-			copy_to_user((int __user *) arg, utsname()->sysname, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->sysname, 30);
 			break;
 		case IOCTL_NODENAME:
-			copy_to_user((int __user *) arg, utsname()->nodename, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->nodename, 30);
 			break;
 		case IOCTL_RELEASE:
-			copy_to_user((int __user *) arg, utsname()->release, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->release, 30);
 			break;
 		case IOCTL_VERSION:
-			copy_to_user((int __user *) arg, utsname()->version, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->version, 30);
 			break;
 		case IOCTL_MACHINE:
-			copy_to_user((int __user *) arg, utsname()->machine, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->machine, 30);
 			break;
 		case IOCTL_DOMAINNAME:
-			copy_to_user((int __user *) arg, utsname()->domainname, 30);
+			raw_copy_to_user((int __user *) arg, utsname()->domainname, 30);
 			break;
 		default:
 			printk(KERN_ALERT "IOCTLPROCFS: Invalid IOCTL Command!\n");
