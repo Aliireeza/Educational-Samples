@@ -42,17 +42,18 @@ MODULE_PARM_DESC(ratelimitflag, "This command line argument will [Enable:1] or d
 
 //Creating a proc directory entry structure
 static struct proc_dir_entry* our_proc_file;
+static int counter = 0;
 
 
-//This function calls on demand of read request from seq_files
-static int proc_show(struct seq_file *m, void *v){
-	printk(KERN_INFO "HELLOWORLDPROCFS: Generating output for user space with seq_files.\n");
-	//We are going to count processes which are currently running on the context of the Kernel
-	struct task_struct *iTask;
-	int counter=0;
+
+//Now there is a re-written version of simply used for_each_process loop
+void browse_processes(struct task_struct *curr_task, struct seq_file *m){
+	struct task_struct *task_next;
+	struct list_head *list;
 
 	//This loop will go around the whole task_struct list in which the Kernel holds all the processes on the system
-	for_each_process(iTask){
+	list_for_each(list, &curr_task->children){
+		task_next = list_entry(list, struct task_struct, sibling);
 		//printk_ratelimit will stop producing logs when you reach the limit which idicated (and could be set) in
 		//    /proc/sys/kernel/printk_ratelimit_burst
 
@@ -60,16 +61,34 @@ static int proc_show(struct seq_file *m, void *v){
 		//    /proc/sys/kernel/printk_ratelimit
 		if(ratelimitflag){
 			if(printk_ratelimit())
-				printk(KERN_INFO "HELLOWORLDPROCFS: Process \"%s:%d\" in %ld state\n", iTask->comm, iTask->pid, iTask->state);
+				printk(KERN_INFO "HELLOWORLDPROCFS: Process \"%s:%d\"\n", task_next->comm, task_next->pid);
 			}
 		else
-			printk(KERN_INFO "HELLOWORLDPROCFS: Process \"%s:%d\" in %ld state\n", iTask->comm, iTask->pid, iTask->state);
+			printk(KERN_INFO "HELLOWORLDPROCFS: Process \"%s:%d\"\n", task_next->comm, task_next->pid);
 
 		//You can uncomment the line bellow if you want to see all processes info in the proc file
 		//seq_printf(m, "HELLOWORLDPROCFS: Process \"%s:%d\" in %ld state\n", iTask->comm, iTask->pid, iTask->state);
+	
 		counter++;
-	}
+		browse_processes(task_next, m);
+	}  
+}
 
+
+//This function calls on demand of read request from seq_files
+static int proc_show(struct seq_file *m, void *v){
+	printk(KERN_INFO "HELLOWORLDPROCFS: Generating output for user space with seq_files.\n");
+	//We are going to count processes which are currently running on the context of the Kernel
+	static struct task_struct *curr_task, *init_task;
+	counter = 0;
+	
+	//First capture the pointer to the current process
+	curr_task = get_current();
+	//With this loop we can find the init_process
+	for(init_task = curr_task; init_task->pid != 0; init_task = init_task->parent);
+	browse_processes(init_task, m);
+	
+	//Now print the essential hello world output
 	seq_printf(m, "Hello World along side with %d processes :)\n", counter);
 	return SUCCESS;
 }
