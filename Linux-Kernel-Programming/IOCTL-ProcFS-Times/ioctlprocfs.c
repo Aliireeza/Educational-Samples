@@ -19,13 +19,13 @@
 //For counting jiffies and HZ
 #include <linux/jiffies.h>
 //For using cputime_to_timespec function
-#include <asm/cputime.h>
+#include <linux/sched/cputime.h>
 //For ktime_get_ts function to obtain uptime
 #include <linux/timekeeping.h>
 //For ioctl commands and macros
 #include <linux/ioctl.h>
 #include <asm/ioctl.h>
-//For copy_to_user, copy_from_user, put_user
+//For raw_copy_to_user, copy_from_user, put_user
 #include <asm/uaccess.h>
 
 //It is always good to have a meaningful constant as a return code
@@ -144,16 +144,16 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	}
 
 	//Then converting the results to timespec structs
-	cputime_to_timespec(user, &calc_user);
-	cputime_to_timespec(nice, &calc_nice);
-	cputime_to_timespec(system, &calc_system);
-	cputime_to_timespec(idle, &calc_idle);
-	cputime_to_timespec(iowait, &calc_iowait);
-	cputime_to_timespec(irq, &calc_irq);
-	cputime_to_timespec(softirq, &calc_softirq);
-	cputime_to_timespec(steal, &calc_steal);
-	cputime_to_timespec(guest, &calc_guest);
-	cputime_to_timespec(guest_nice, &calc_guest_nice);
+	calc_user = ktime_to_timespec(user);
+	calc_nice = ktime_to_timespec(nice);
+	calc_system = ktime_to_timespec(system);
+	calc_idle = ktime_to_timespec(idle);
+	calc_iowait = ktime_to_timespec(iowait);
+	calc_irq = ktime_to_timespec(irq);
+	calc_softirq = ktime_to_timespec(softirq);
+	calc_steal = ktime_to_timespec(steal);
+	calc_guest = ktime_to_timespec(guest);
+	calc_guest_nice = ktime_to_timespec(guest_nice);
 
 
 	//for using them as string buffer, we have to convert them into string
@@ -176,40 +176,40 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	//Now we have all our times, so we have to rcognize the signal
 	switch(cmd){
 		case IOCTL_UPTIME:
-			copy_to_user((int __user *) arg,  buff_uptime, 30);
+			raw_copy_to_user((int __user *) arg,  buff_uptime, 30);
 			break;
 		case IOCTL_IRQ_TIME:
-			copy_to_user((int __user *) arg,  buff_irq, 30);
+			raw_copy_to_user((int __user *) arg,  buff_irq, 30);
 			break;
 		case IOCTL_JIFFIES:
-			copy_to_user((int __user *) arg,  buff_jiffies, 30);
+			raw_copy_to_user((int __user *) arg,  buff_jiffies, 30);
 			break;
 		case IOCTL_USER_TIME:
-			copy_to_user((int __user *) arg,  buff_user, 30);
+			raw_copy_to_user((int __user *) arg,  buff_user, 30);
 			break;
 		case IOCTL_SYSTEM_TIME:
-			copy_to_user((int __user *) arg,  buff_system, 30);
+			raw_copy_to_user((int __user *) arg,  buff_system, 30);
 			break;
 		case IOCTL_NICE_TIME:
-			copy_to_user((int __user *) arg,  buff_nice, 30);
+			raw_copy_to_user((int __user *) arg,  buff_nice, 30);
 			break;
 		case IOCTL_IDLE_TIME:
-			copy_to_user((int __user *) arg,  buff_idle, 30);
+			raw_copy_to_user((int __user *) arg,  buff_idle, 30);
 			break;
 		case IOCTL_IOWAIT_TIME:
-			copy_to_user((int __user *) arg,  buff_iowait, 30);
+			raw_copy_to_user((int __user *) arg,  buff_iowait, 30);
 			break;
 		case IOCTL_GUEST_TIME:
-			copy_to_user((int __user *) arg,  buff_guest, 30);
+			raw_copy_to_user((int __user *) arg,  buff_guest, 30);
 			break;
 		case IOCTL_GUEST_NICE_TIME:
-			copy_to_user((int __user *) arg,  buff_nice, 30);
+			raw_copy_to_user((int __user *) arg,  buff_nice, 30);
 			break;
 		case IOCTL_STEAL_TIME:
-			copy_to_user((int __user *) arg,  buff_steal, 30);
+			raw_copy_to_user((int __user *) arg,  buff_steal, 30);
 			break;
 		case IOCTL_SOFTIRQ_TIME:
-			copy_to_user((int __user *) arg,  buff_uptime, 30);
+			raw_copy_to_user((int __user *) arg,  buff_uptime, 30);
 			break;
 		default:
 			printk(KERN_ALERT "IOCTLPROCFS: Invalid IOCTL Command!\n");
