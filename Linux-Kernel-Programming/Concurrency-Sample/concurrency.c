@@ -81,7 +81,7 @@ static ssize_t procfs_read(struct file *filp, char *buffer, size_t length, loff_
 	}
 	else{
 		//otherwise, fill the buffer with the current message in procfs_buffer, then return the buffer size
-		if(copy_to_user(buffer, procfs_buffer, procfs_buffer_size))
+		if(raw_copy_to_user(buffer, procfs_buffer, procfs_buffer_size))
 			return -EFAULT;
 
 		printk(KERN_INFO "CONCURRENCY: Proc Filesystem, Read %lu bytes\n", procfs_buffer_size);
@@ -107,7 +107,7 @@ static ssize_t procfs_write(struct file *file, const char *buffer, size_t length
 		procfs_buffer_size = length;
 
 	//Write data from user, which is in the buffer to our procfs_buffer, with the procfs_buffer_size caculated above
-	if(copy_from_user(procfs_buffer, buffer, procfs_buffer_size))
+	if(raw_copy_from_user(procfs_buffer, buffer, procfs_buffer_size))
 		return -EFAULT;
 
 	printk(KERN_INFO "READWRITEPROCFS: Proc Filesystem, Write %lu bytes\n", procfs_buffer_size);
@@ -163,7 +163,7 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 	}
 	else{
 		//otherwise, fill the buffer with the current message in procfs_buffer, then return the buffer size
-		if(copy_to_user(buffer, dev_buffer, dev_buffer_size))
+		if(raw_copy_to_user(buffer, dev_buffer, dev_buffer_size))
 			return -EFAULT;
 
 
@@ -188,7 +188,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t length
 		dev_buffer_size = length;
 
 	//Write data from user, which is in the buffer to our procfs_buffer, with the procfs_buffer_size caculated above
-	if (copy_from_user(dev_buffer, buffer, dev_buffer_size))
+	if (raw_copy_from_user(dev_buffer, buffer, dev_buffer_size))
 		return -EFAULT;
 
 	//Now we could release the reader process by completing our completion
