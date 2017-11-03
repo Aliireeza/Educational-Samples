@@ -62,35 +62,41 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 	switch(hook_protocol){
 		case 0:
 			if(ip_header->protocol == IPPROTO_UDP){
-				printk(KERN_INFO "PROTOCOLFILTER: UDP Packet Dropped\n");
+				if(printk_ratelimit())
+					printk(KERN_ALERT "PROTOCOLFILTER: UDP Packet Dropped\n");
 				return NF_DROP;
 			}
 			break;
 		case 1:
 			if(ip_header->protocol == IPPROTO_TCP){
-				printk(KERN_INFO "PROTOCOLFILTER: TCP Packet Dropped\n");
+				if(printk_ratelimit())
+					printk(KERN_ALERT "PROTOCOLFILTER: TCP Packet Dropped\n");
 				return NF_DROP;
 			}
 			break;
 		case 2:
-			printk(KERN_INFO "PROTOCOLFILTER: IP Packet Dropped\n");
+			if(printk_ratelimit())
+				printk(KERN_ALERT "PROTOCOLFILTER: IP Packet Dropped\n");
 			return NF_DROP;
 			break;
 		case 3:
 			if(ip_header->protocol == IPPROTO_ICMP){
-				printk(KERN_INFO "PROTOCOLFILTER: ICMP Packet Dropped\n");
+				if(printk_ratelimit())
+					printk(KERN_ALERT "PROTOCOLFILTER: ICMP Packet Dropped\n");
 				return NF_DROP;
 			}
 			break;
 		case 4:
 			if(ip_header->protocol == 115){
-				printk(KERN_INFO "PROTOCOLFILTER: L2TP Packet Dropped\n");
+				if(printk_ratelimit())
+					printk(KERN_ALERT "PROTOCOLFILTER: L2TP Packet Dropped\n");
 				return NF_DROP;
 			}
 			break;
 		default:
 			if(ip_header->protocol == 89){
-				printk(KERN_INFO "PROTOCOLFILTER: OSPF Packet Dropped\n");
+				if(printk_ratelimit())
+					printk(KERN_ALERT "PROTOCOLFILTER: OSPF Packet Dropped\n");
 				return NF_DROP;
 			}
 		}
@@ -100,12 +106,21 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 
 
 //Netfilter hook_operations would be the key to add this functionality to he Kernel
-static struct nf_hook_ops nfho ={
+static struct nf_hook_ops in_nfho ={
 	.hook = hook_func,
 	.hooknum = 1,
 	.pf = PF_INET,
 	.priority = NF_IP_PRI_FIRST,
 };
+
+
+static struct nf_hook_ops out_nfho ={
+	.hook = hook_func,
+	.hooknum = 5,
+	.pf = PF_INET,
+	.priority = NF_IP_PRI_FIRST,
+};
+
 
 
 //Every Module must have an entry point which is known as init_module or
@@ -120,9 +135,10 @@ static int __init protocol_filter_init(void){
 	//Initializing network namespace
 	netns = get_net(&init_net);
 	//Now we have to just add our hook to the netfilter
-	nf_register_net_hook(netns, &nfho);
+	nf_register_net_hook(netns, &in_nfho);
+	nf_register_net_hook(netns, &out_nfho);
 	
-	printk(KERN_INFO "PROTOCOLFILTER: Netfilter-Hook has been Registered.\n");
+	printk(KERN_INFO "PROTOCOLFILTER: Netfilter-Hooks have been Registered.\n");
 	//The init_module should return a value to the rest of kernel that asure
 	//them to its successfully registration of its functionality
 	return SUCCESS;
@@ -136,8 +152,9 @@ static void __exit protocol_filter_exit(void){
 	printk(KERN_INFO "PROTOCOLFILTER: Cleanup Module, Process \"%s:%i\"\n", current->comm, current->pid);
 	
 	//Unregistering our hook from the system
-	nf_unregister_net_hook(netns, &nfho);
-	printk(KERN_INFO "PROTOCOLFILTER: Netfilter-Hook has been UN-Registered.\n");
+	nf_unregister_net_hook(netns, &in_nfho);
+	nf_unregister_net_hook(netns, &out_nfho);
+	printk(KERN_INFO "PROTOCOLFILTER: Netfilter-Hooks have been UN-Registered.\n");
 	
 	printk(KERN_INFO "PROTOCOLFILTER: GoodBye.\n");
 	//The cleanup_module function doesn't need to return any value to the rest of the kernel
