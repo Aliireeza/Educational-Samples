@@ -19,7 +19,7 @@
 //For counting jiffies and HZ
 #include <linux/jiffies.h>
 //For using cputime_to_timespec function
-#include <asm/cputime.h>
+#include <linux/sched/cputime.h>
 //For ktime_get_ts function to obtain uptime
 #include <linux/timekeeping.h>
 
@@ -50,13 +50,13 @@ static int proc_show(struct seq_file *m, void *v){
 	static struct timespec calc_uptime;
 	static struct timespec calc_idle;
 	int i;
-	cputime_t calc_idletime = 0;
+	ktime_t calc_idletime = 0;
 
 	ktime_get_ts(&calc_uptime);
 
 	for_each_possible_cpu(i)
 		calc_idletime += kcpustat_cpu(i).cpustat[CPUTIME_IDLE];
-	cputime_to_timespec(calc_idletime, &calc_idle);
+	calc_idle = ktime_to_timespec(calc_idletime);
 	
 
 	seq_printf(m, "%lu.%02lu %lu.%02lu\n",
