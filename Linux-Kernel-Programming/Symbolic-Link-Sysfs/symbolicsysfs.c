@@ -22,7 +22,7 @@
 //For counting jiffies and HZ
 #include <linux/jiffies.h>
 //For using cputime_to_timespec function
-#include <asm/cputime.h>
+#include <linux/sched/cputime.h>
 //For ktime_get_ts function to obtain uptime
 #include <linux/timekeeping.h>
 
@@ -203,16 +203,16 @@ static ssize_t times_show(struct kobject *kobj, struct kobj_attribute *attr, cha
 		}
 
 	//Then converting the results to timespec structs
-	cputime_to_timespec(user, &calc_user);
-	cputime_to_timespec(nice, &calc_nice);
-	cputime_to_timespec(system, &calc_system);
-	cputime_to_timespec(idle, &calc_idle);
-	cputime_to_timespec(iowait, &calc_iowait);
-	cputime_to_timespec(irq, &calc_irq);
-	cputime_to_timespec(softirq, &calc_softirq);
-	cputime_to_timespec(steal, &calc_steal);
-	cputime_to_timespec(guest, &calc_guest);
-	cputime_to_timespec(guest_nice, &calc_guest_nice);
+	calc_user = ktime_to_timespec(user);
+	calc_nice = ktime_to_timespec(nice);
+	calc_system = ktime_to_timespec(system);
+	calc_idle = ktime_to_timespec(idle);
+	calc_iowait = ktime_to_timespec(iowait);
+	calc_irq = ktime_to_timespec(irq);
+	calc_softirq = ktime_to_timespec(softirq);
+	calc_steal = ktime_to_timespec(steal);
+	calc_guest = ktime_to_timespec(guest);
+	calc_guest_nice = ktime_to_timespec(guest_nice);
 
 
 	//We have to decide on which attribute show wich content to the userspace
