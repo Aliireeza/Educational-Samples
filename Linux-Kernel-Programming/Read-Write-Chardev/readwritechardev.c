@@ -80,14 +80,14 @@ int device_open(struct inode *inode, struct file *file){
 static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t * offset){
 	static int ret = 0;
 	printk(KERN_INFO "READWRITECHARDEV: Read Function, Process \"%s:%i\"\n", current->comm, current->pid);
-	if (ret) {
+	if(ret){
 		//we have finished to read, return 0, incase you use an application that try to find an EOF
 		printk(KERN_INFO "READWRITECHARDEV: /dev entry read has END\n");
 		ret = 0;
 	}
 	else{
 		//Write data to the user buffer
-		if ( copy_to_user(buffer, dev_buffer, dev_buffer_size) )
+		if(raw_copy_to_user(buffer, dev_buffer, dev_buffer_size))
 			return -EFAULT;
 
 		printk(KERN_INFO "READWRITECHARDEV: %lu bytes has read from /dev entry\n", dev_buffer_size);
@@ -108,7 +108,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t length
 		dev_buffer_size = length;
 
 	//Write data from the user buffer
-	if (copy_from_user(dev_buffer, buffer, dev_buffer_size))
+	if(raw_copy_from_user(dev_buffer, buffer, dev_buffer_size))
 		return -EFAULT;
 
 	//The function returns the number charachters which have been written
@@ -157,11 +157,11 @@ long device_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 			printk(KERN_INFO "READWRITECHARDEV: IOCTL_RESET signal has been received.\n");
 			break;
 		case IOCTL_MAX_BUFFER_SIZE:
-			copy_to_user((int __user *) arg, MAX_BUF_LEN, 15);
+			raw_copy_to_user((int __user *) arg, MAX_BUF_LEN, 15);
 			printk(KERN_INFO "READWRITECHARDEV: IOCTL_MAX_BUFFER_SIZE signal has been received.\n");
 			break;
 		case IOCTL_DEV_BUFFER_SIZE:
-			copy_to_user((int __user *) arg, dev_buffer_size, 15);
+			raw_copy_to_user((int __user *) arg, dev_buffer_size, 15);
 			printk(KERN_INFO "READWRITECHARDEV: IOCTL_DEV_BUFFER_SIZE signal has been received.\n");
 			break;
 		default:

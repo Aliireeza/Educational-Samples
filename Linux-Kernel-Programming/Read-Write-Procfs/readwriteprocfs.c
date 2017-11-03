@@ -56,14 +56,14 @@ int procfs_open(struct inode *inode, struct file *file){
 static ssize_t procfs_read(struct file *filp, char *buffer, size_t length, loff_t * offset){
 	static int ret = 0;
 	printk(KERN_INFO "READWRITEPROCFS: Read Function, Process \"%s:%i\"\n", current->comm, current->pid);
-	if (ret) {
+	if(ret){
 		/* we have finished to read, return 0 */
 		printk(KERN_INFO "READWRITEPROCFS: Read END\n");
 		ret = 0;
 	}
 	else{
 		//Write data to the user buffer
-		if ( copy_to_user(buffer, procfs_buffer, procfs_buffer_size) )
+		if(raw_copy_to_user(buffer, procfs_buffer, procfs_buffer_size))
 			return -EFAULT;
 
 		printk(KERN_INFO "READWRITEPROCFS: Read %lu bytes\n", procfs_buffer_size);
@@ -79,12 +79,12 @@ static ssize_t procfs_read(struct file *filp, char *buffer, size_t length, loff_
 static ssize_t procfs_write(struct file *file, const char *buffer, size_t length, loff_t * off){
 	printk(KERN_INFO "READWRITEPROCFS: Write Function, Process \"%s:%i\"\n", current->comm, current->pid);
 	//get buffer size
-	if (length > MAX_BUF_LEN)
+	if(length > MAX_BUF_LEN)
 		procfs_buffer_size = MAX_BUF_LEN;
 	else
 		procfs_buffer_size = length;
 	//Write data from the user buffer
-	if (copy_from_user(procfs_buffer, buffer, procfs_buffer_size))
+	if(raw_copy_from_user(procfs_buffer, buffer, procfs_buffer_size))
 		return -EFAULT;
 
 	//The function returns the number charachters which have been written
