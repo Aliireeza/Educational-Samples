@@ -51,9 +51,11 @@
 //These are some useful information that could reveald with modinfo command
 //Set module license to get rid of tainted kernel warnings
 MODULE_LICENSE("GPL");
-//Introduce the module's developer and it's functionality
-MODULE_AUTHOR("Aliireeza Teymoorian");
+//Introduce the module's developer, it's functionality and version
+MODULE_AUTHOR("Aliireeza Teymoorian <teymoorian@gmail.com>");
 MODULE_DESCRIPTION("This is an advance Character Device driver with ioctl, concurrency, capabilities, and auto dev file creation");
+MODULE_VERSION("1.0.2");
+
 
 
 //Major is for device driver major number and device open is just a flag
@@ -206,14 +208,14 @@ int device_open(struct inode *inode, struct file *file){
 static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t * offset){
 	static int ret = 0;
 	printk(KERN_INFO "ADVANCEDCHARDEV: DEV File Read Function, Process \"%s:%i\"\n", current->comm, current->pid);
-	if (ret) {
+	if(ret){
 		/* we have finished to read, return 0 */
 		printk(KERN_INFO "ADVANCEDCHARDEV: /dev entry read has END\n");
 		ret = 0;
 	}
 	else{
 		/* fill the buffer, return the buffer size */
-		if ( copy_to_user(buffer, dev_buffer, dev_buffer_size) )
+		if(raw_copy_to_user(buffer, dev_buffer, dev_buffer_size))
 			return -EFAULT;
 
 		printk(KERN_INFO "ADVANCEDCHARDEV: %lu bytes has read from /dev entry\n", dev_buffer_size);
@@ -234,7 +236,7 @@ static ssize_t device_write(struct file *file, const char *buffer, size_t length
 		dev_buffer_size = length;
 
 	//write data to the buffer
-	if (copy_from_user(dev_buffer, buffer, dev_buffer_size))
+	if(raw_copy_from_user(dev_buffer, buffer, dev_buffer_size))
 		return -EFAULT;
 
 	//The function returns wrote charachters count
