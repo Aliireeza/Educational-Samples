@@ -36,7 +36,7 @@
 //It is always good to have a meaningful constant as a return code
 #define SUCCESS 0
 //This will be our module name
-#define MY_MODULE_NAME "protocolfilter"
+#define MY_MODULE_NAME "portfilter"
 
 
 //These are some useful information that could reveald with modinfo command
@@ -86,7 +86,7 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
 		}
 	}
 	
-	//This will filter any TCP requsts for the specified port
+	//This will filter any UDP requsts for the specified port
 	if(ip_header && ip_header->protocol == IPPROTO_UDP){
 		udp_header = (struct udphdr *) skb_transport_header(skb);
 		if(udp_header && (ntohs(udp_header->dest) == (unsigned short) hook_port || ntohs(udp_header->source) == (unsigned short) hook_port)){
