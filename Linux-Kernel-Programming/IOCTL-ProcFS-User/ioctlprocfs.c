@@ -169,7 +169,7 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 			printk(KERN_ALERT "IOCTLPROCFS: Invalid IOCTL Command!\n");
 			return -ENOTTY;
 	}
-	copy_to_user((int __user *) arg, output, 30);
+	raw_copy_to_user((int __user *) arg, output, 30);
 	return retval;
 }
 
