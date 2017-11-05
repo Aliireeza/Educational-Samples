@@ -1,6 +1,8 @@
 # Simple Image Viewer 1.0.2
 A simple example of how to write a practical Qt based Linux desktop application
+
 <center><img src="https://github.com/Aliireeza/Educational-Samples/blob/master/Linux-QT-Programming/Simple-Image-Viewer/SimpleImageViewer.png" width="500" alt="Simple Image Viewer Screenshot"/></center>
+
 ## Functionality
 1. Drag and drop for image containing folders or single image files
 2. Full screen view with black background
