@@ -1,4 +1,4 @@
-#Simple Image Viewer 1.0.2
+# Simple Image Viewer 1.0.2
 A simple example of how to write a practical Qt based Linux desktop application
 
 ## Functionality
