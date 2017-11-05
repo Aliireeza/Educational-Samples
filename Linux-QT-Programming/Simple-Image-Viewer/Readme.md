@@ -23,7 +23,7 @@ make
 in Ubuntu
 ```
 cd /path/to/the/simple/image/viewer/folder/
-make
+qmake
 make
 ```
 Run and Enjoy ;)
