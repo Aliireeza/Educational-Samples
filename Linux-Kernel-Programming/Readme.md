@@ -26,17 +26,17 @@ This module will filter all incoming and outgoing network traffic of your system
 
 
 ### Course Syllabus (For Now)
-1. Part One: An Introduction To Linux Kernel Programming (10 hours)
-      1.1. Linux Kernel programming Intro (2 hours)
-           1.1.1. History Behind Linux Kernel
-           1.1.2. Linux Kernel Versions
-           1.1.3. Monolithic Architecture Vs. Micro-Kernel
-           1.1.4. Kernel Modules Vs. User-Space Programs
-           1.1.5. Loadable Kernel Modules Vs. Drivers
-           1.1.6. Kernel Subsystems and Driver Types
-           1.1.7. Setting Up an Environment
-           1.1.8. Compiling a Fresh Kernel
-	1.1. Make Your First Loadable Kernel Module (2 hours)
+1000. Part One: An Introduction To Linux Kernel Programming (10 hours)
+      i. Linux Kernel programming Intro (2 hours)
+           ii. History Behind Linux Kernel
+           ii. Linux Kernel Versions
+           ii. Monolithic Architecture Vs. Micro-Kernel
+           ii. Kernel Modules Vs. User-Space Programs
+           ii. Loadable Kernel Modules Vs. Drivers
+           ii. Kernel Subsystems and Driver Types
+           ii. Setting Up an Environment
+           ii. Compiling a Fresh Kernel
+	i. Make Your First Loadable Kernel Module (2 hours)
            1.2.1. Anatomy of a Loadable Kernel Module
            1.2.2. Writing Your First Kernel Module
            1.2.3. Using Kernel Logs To Communicate With User
@@ -45,7 +45,7 @@ This module will filter all incoming and outgoing network traffic of your system
            1.2.6. Building a Kernel Module with Makefiles
            1.2.7. Installing, Removing and Reviewing a Module’s Info
            1.2.8. How It Actually Works
-      1.3. Kernel Space - User Space Interfaces (4 hours)
+      i. Kernel Space - User Space Interfaces (4 hours)
            1.3.1. Using Proc File System and Seq-Files 
            1.3.2. Using Device Files, Major and Minor Numbers 
            1.3.3. Communicating with User-Space Through Charachter Devices
