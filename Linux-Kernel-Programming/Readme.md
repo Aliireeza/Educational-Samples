@@ -7,10 +7,20 @@ A repository for various types of Linux Kernel modules and driver which I use to
 This module will filter all incoming and outgoing network traffic of your system on a single port, then if it received a specific ICMP packet it will open it for the sender IP address and by receiving the second magic packet it closes it again. This will be perform by registering two netfilter hooks.
 
 ### Current Samples
-
+Current samples each packed in a seperated folder with specific Readme and Makefile. they all have been tested on Linux Kernel 4.13.10 and above and I hope that they do not have any particular problems on your system, but if they have and you could not figure the issue, please send me an email (teymoorian [at] gmail [dot] com), but I know for sure that you will figure it out.<br>
+All samples tried to be as minimalistic as possible and commented so be self-documented and I know that they might not be very useful when you consider them isolately, but I hope that they provide an up-to-date source-code-based documentation for the aggressively under developing Linux Kernel.
 
 ### Essential Needs
-
+For running them you need some essentials of your GNU/Linux distributions
+on Ubuntu
+```
+apt install libncurses5 build-essential linux-headers-`uname -r`
+```
+on Fedora
+```
+dnf install kernel-devel
+```
+Also this remains at the bottom line on Kernel development essential tools, you might find it useful to use some sophisticated code editor or IDEs as well like (link+)
 
 ### Resources (Not all of them)
 - Linux Device Drivers, 3rd Edition, By Greg Kroah-Hartman, Alessandro Rubini & Jonathan Corbet, O'REILLY
