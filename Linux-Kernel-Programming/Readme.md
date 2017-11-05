@@ -4,7 +4,7 @@ A repository for various types of Linux Kernel modules and driver which I use to
 
 
 ### The Goal
-This module will filter all incoming and outgoing network traffic of your system on a single port, then if it received a specific ICMP packet it will open it for the sender IP address and by receiving the second magic packet it closes it again. This will be perform by registering two netfilter hooks.
+Creating a vast variety of Linux Kernel module/driver programming samples, to be used in my classes and also could be used as self documentory sources for studying in this field
 
 ### Current Samples
 Current samples each packed in a seperated folder with specific Readme and Makefile. they all have been tested on Linux Kernel 4.13.10 and above and I hope that they do not have any particular problems on your system, but if they have and you could not figure the issue, please send me an email (teymoorian [at] gmail [dot] com), but I know for sure that you will figure it out.<br>
