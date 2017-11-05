@@ -13,10 +13,19 @@ A simple example of how to write a practical Qt based Linux desktop application
 ## Install
 If you have a prepared QT development environment and essential tools on your machine, it would be as simple as below three steps:
 
-`cd /path/to/the/simple/image/viewer/folder/`
-in Fedora `qmake-qt5`
-in Ubuntu `qmake`
-`make`
+in Fedora
+```
+cd /path/to/the/simple/image/viewer/folder/
+qmake-qt5
+make
+```
+
+in Ubuntu
+```
+cd /path/to/the/simple/image/viewer/folder/
+make
+make
+```
 Run and Enjoy ;)
 
 
