@@ -7,7 +7,7 @@ A repository for various types of Linux Kernel modules and driver which I use to
 Creating a vast variety of Linux Kernel module/driver programming samples, to be used in my classes and also could be used as self documentory sources for studying in this field
 
 ### Current Samples
-Current samples each packed in a seperated folder with specific Readme and Makefile. they all have been tested on Linux Kernel 4.13.10 and above and I hope that they do not have any particular problems on your system, but if they have and you could not figure the issue, please send me an email (teymoorian [at] gmail [dot] com), but I know for sure that you will figure it out.<br>
+Current samples each packed in a seperated folder with specific Readme and Makefile. they all have been tested on Linux Kernel 4.14.13 and above and I hope that they do not have any particular problems on your system, but if they have and you could not figure the issue, please send me an email (teymoorian [at] gmail [dot] com), but I know for sure that you will figure it out.<br>
 All samples tried to be as minimalistic as possible and commented so be self-documented and I know that they might not be very useful when you consider them isolately, but I hope that they provide an up-to-date source-code-based documentation for the aggressively under developing Linux Kernel.
 
 ### Essential Needs
