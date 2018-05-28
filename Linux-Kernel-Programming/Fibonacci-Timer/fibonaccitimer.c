@@ -47,7 +47,7 @@ static int i = 0;
 
 
 //This function will call at each timer's timeout
-void fibonaccitimer(unsigned long data){
+void fibonaccitimer(struct timer_list *timer){
 	if(i<=19){
 		after_delay_time[i++] = jiffies;
 		delay_c = delay_a + delay_b;
@@ -102,9 +102,7 @@ static int __init fibonacci_timer_init(void){
 	printk(KERN_INFO "FIBONACCITIMER: /proc/%s has been created.\n", DEVICE_NAME);
 
 	//It is now time to initiate our timer, but it will not start yet
-	init_timer(&mytimer);
 	mytimer.function = fibonaccitimer;
-	mytimer.data = 1;
 	mytimer.expires = jiffies + delay_b;
 
 	//now start the timer

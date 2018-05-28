@@ -9,7 +9,7 @@
 //For create and register a procfs entry
 #include <linux/proc_fs.h>
 //For copy_to_user, copy_from_user, put_user
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 //For finding the parent process ID of the module
 #include <asm/current.h>
 //For using task_struct
@@ -281,6 +281,7 @@ static int __init concurrency_init(void){
 
 //You sould clean up the mess before exiting the module
 static void __exit concurrency_exit(void){
+	int retval;
 	printk(KERN_INFO "CONCURRENCY: Unregisteration Process\n");
 	printk(KERN_INFO "CONCURRENCY: Cleanup Module, Process \"%s:%d\" \n", current->comm, current->pid);
 
@@ -296,7 +297,6 @@ static void __exit concurrency_exit(void){
 	//First, get rid of our semaphores
 
 	//Then, our completion with useless return value, stupid!
-	long retval;
 	complete_and_exit(&comp, retval);
 	//And finally, our spinlock will release
 
