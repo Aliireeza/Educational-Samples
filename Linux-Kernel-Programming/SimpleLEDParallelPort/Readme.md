@@ -1,4 +1,4 @@
-# Net Device Notifier Kernel Module
+# Simple LED Parallel Port Driver
 
 a simple module to make an introduction to Kernel module programming using parallel port, interrupt handeling and timers
 
