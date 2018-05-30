@@ -70,7 +70,7 @@ static int parallel_step = 500;
 module_param(parallel_step, int, 0);
 MODULE_PARM_DESC(parallel_step, "Change blinking speed in each round, Default:500ms, Min:100ms, Max:1000ms");
 
-static int parallel_value = 1;
+static unsigned int parallel_value = 1;
 
 static int parallel_base = 0x378;
 module_param(parallel_base, int, 0);
@@ -108,24 +108,21 @@ irqreturn_t parallel_interrupt_handler(int irq, void *dev_id){
 //This is the timer function which produce the desire output for
 //the parallel port depend on the parallel_mode value
 void parallel_timer_funtion(struct timer_list *timer){
-	parallel_value = inb(parallel_base);
-	rmb();
-	
 	switch(parallel_mode){
 		case 0:
-			if(parallel_value >= 128 || parallel_value == 0)
+			if(parallel_value >= 255 || parallel_value == 0)
 				parallel_value = 1;
 			else
 				parallel_value *= 2;
 			break;
 		case 1:
-			if(parallel_value >= 127)
+			if(parallel_value >= 255)
 				parallel_value = 0;
 			else
-				parallel_value = 127;
+				parallel_value = 255;
 			break;
 		default:
-			if(parallel_value <= 127)
+			if(parallel_value <= 255)
 				parallel_value ++;
 			else
 				parallel_value = 0;
@@ -287,6 +284,7 @@ long proc_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 			printk(KERN_INFO "PARALLELLED: Parallel Mode Write IOCTL Command\n");
 			raw_copy_from_user(buffer, (int __user *) arg, 30);
 			sscanf(buffer, "%d\n", &parallel_mode);
+			parallel_value = 0;
 			break;	
 	default:
 		printk(KERN_ALERT "PARALLELLED: Invalid IOCTL Cmd (%u)\n", cmd);
