@@ -37,7 +37,7 @@ static int parallel_base = 0x378;
 //Some global variables
 static int parallel_irq = -1;
 static int timer_expire_delay = 1000;
-static int desire_output = 0;
+static unsigned int desire_output = 0;
 //We have to use struct timer_list to creat our own timer
 static struct timer_list our_timer;
 
@@ -48,15 +48,13 @@ void our_timer_function(struct timer_list *timer){
 	//which could light a LED in a row of 8 LEDs, each time it will do it for next one
 	//at the end of the row (pin 9) it will generate an interrupt which make everything slower
 	//after ten times, everyting reset to the initial speed
-	desire_output = inb(parallel_base);
-	rmb();
-	if(desire_output >= 128 || desire_output == 0)
+	if(desire_output >= 255 || desire_output == 0)
 		desire_output = 1;
 	else
 		desire_output *= 2;
 	outb(desire_output, parallel_base);
 	wmb();
-	printk(KERN_INFO "PARALLELLED: Port Output = %d\n", desire_output);
+	printk(KERN_INFO "PARALLELLED: Port Output = %u\n", desire_output);
 	//Now we just reschedule timer and get out
 	mod_timer(&our_timer, jiffies + timer_expire_delay);
 }
@@ -133,11 +131,7 @@ static int __init parallel_led_init(void){
 		release_region(parallel_base, 4);
 		return -EFAULT;
 		}
-	
-	//Set the parallel port to initial zero state
-	outb(0x00, parallel_base);
-	wmb();
-	udelay(7);
+
 
 	//It is now time to initiate our timer, but it will not start yet	
 	our_timer.function = our_timer_function;
